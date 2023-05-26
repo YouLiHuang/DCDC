@@ -1,0 +1,2 @@
+../MyCode/PROTECT/protect.c:16:6:HAL_ADC_ConvCpltCallback	16	static
+../MyCode/PROTECT/protect.c:38:6:Check_Error	16	static

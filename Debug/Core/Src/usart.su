@@ -1,0 +1,9 @@
+../Core/Src/usart.c:44:6:MX_USART1_UART_Init	8	static
+../Core/Src/usart.c:88:6:MX_USART2_UART_Init	8	static
+../Core/Src/usart.c:133:6:MX_USART3_UART_Init	8	static
+../Core/Src/usart.c:164:6:HAL_UART_MspInit	104	static
+../Core/Src/usart.c:332:6:HAL_UART_MspDeInit	16	static
+../Core/Src/usart.c:411:6:Usart1_Display_Data_Value	40	static
+../Core/Src/usart.c:431:6:Usart1_Display_String	16	static
+../Core/Src/usart.c:441:6:My_Usart3_Config	16	static
+../Core/Src/usart.c:450:6:USART2_IDLECallback	16	static

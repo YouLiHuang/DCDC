@@ -1,0 +1,13 @@
+../MyCode/RS232/RS232.c:55:10:CRC16	24	static
+../MyCode/RS232/RS232.c:74:6:USART3_Send	8	static
+../MyCode/RS232/RS232.c:91:6:uint16_t_to_uint8_t	16	static
+../MyCode/RS232/RS232.c:97:13:function20	8	static
+../MyCode/RS232/RS232.c:142:13:function21	8	static
+../MyCode/RS232/RS232.c:173:13:function22	8	static
+../MyCode/RS232/RS232.c:206:13:function26	8	static
+../MyCode/RS232/RS232.c:231:13:function27	8	static
+../MyCode/RS232/RS232.c:261:13:function28	8	static
+../MyCode/RS232/RS232.c:287:13:function29	8	static
+../MyCode/RS232/RS232.c:308:13:function2a	8	static
+../MyCode/RS232/RS232.c:327:6:USART3_Handler	8	static
+../MyCode/RS232/RS232.c:361:6:RS232_IT	8	static
