@@ -1240,30 +1240,78 @@ void Display_Main_Interface_CYCLE_DELAY(uint8_t CYCLE_NOT_CYCLE, uint8_t DELAY_N
 void Display_Main_Interface_V_set  (void)
 
 {
-
-	Write_String_8x16AsicII(48,56,"VSET");
-	Write_String_16x32AsicII(16,0,String_Voltage);
-
-	//显示之前电流设定值
-	float Current=Set_Current/100.0;
-	static char String_Current_real[7]={'0','0','0','.','0','0'};
-	if(Current>=100)   		sprintf(String_Current_real, "%6.2f", Current);//将float转为string，保留一位小数
-	else if(Current>=9.99)
+	if(Keys_Encoder_Mode==Encoder_Mode)
 	{
-		String_Current_real[0]='0';
-		sprintf(&String_Current_real[1], "%5.2f", Current);//保留两位小数
-	}
-	else if(Current>=0)
-	{
-		String_Current_real[0]='0';
-		String_Current_real[1]='0';
-		sprintf(&String_Current_real[2], "%4.2f", Current);
+		Write_String_8x16AsicII(48,56,"VSET");
+
+
+		/*显示上一电流设定值*/
+		float Current=Set_Current/100.0;
+		static char String_Current_real[7]={'0','0','0','.','0','0'};
+		if(Current>=100)   		sprintf(String_Current_real, "%6.2f", Current);//将float转为string，保留一位小数
+		else if(Current>=9.99)
+		{
+			String_Current_real[0]='0';
+			sprintf(&String_Current_real[1], "%5.2f", Current);//保留两位小数
+		}
+		else if(Current>=0)
+		{
+			String_Current_real[0]='0';
+			String_Current_real[1]='0';
+			sprintf(&String_Current_real[2], "%4.2f", Current);
+
+		}
+		Write_String_16x32AsicII(16,36,String_Current_real);
+		Write_Single_16x32AsicII(16,60,'A');
+		/*显示上电压设定值*/
+		float Voltage=String_to_float(String_Voltage);//实时设定值
+		if(Voltage>=100)   		sprintf(String_Voltage, "%6.2f", Voltage);//将float转为string，保留一位小数
+		else if(Voltage>=9.99)
+		{
+			String_Voltage[0]='0';
+			sprintf(&String_Voltage[1], "%5.2f", Voltage);//保留两位小数
+		}
+		else if(Voltage>=0)
+		{
+			String_Voltage[0]='0';
+			String_Voltage[1]='0';
+			sprintf(&String_Voltage[2], "%4.2f", Voltage);
+
+		}
+
+		Write_String_16x32AsicII(16, 0, String_Voltage);
+		Write_Single_16x32AsicII(16,24, 'V');
+
 
 	}
-	Write_String_16x32AsicII(16,36,String_Current_real);
-	Write_Single_16x32AsicII(16,60,'A');
-	/*显示电压设定值*/
-	Write_String_16x32AsicII(16,0,String_Voltage);
+	else if(Keys_Encoder_Mode==Keys_Mode)
+	{
+		Write_String_8x16AsicII(48,56,"VSET");
+		Write_String_16x32AsicII(16,0,String_Voltage);
+
+		/*显示上一电流设定值*/
+		float Current=Set_Current/100.0;
+		static char String_Current_real[7]={'0','0','0','.','0','0'};
+		if(Current>=100)   		sprintf(String_Current_real, "%6.2f", Current);//将float转为string，保留一位小数
+		else if(Current>=9.99)
+		{
+			String_Current_real[0]='0';
+			sprintf(&String_Current_real[1], "%5.2f", Current);//保留两位小数
+		}
+		else if(Current>=0)
+		{
+			String_Current_real[0]='0';
+			String_Current_real[1]='0';
+			sprintf(&String_Current_real[2], "%4.2f", Current);
+
+		}
+		Write_String_16x32AsicII(16,36,String_Current_real);
+		Write_Single_16x32AsicII(16,60,'A');
+		/*显示当前电压设定值*/
+		Write_String_16x32AsicII(16, 0, String_Voltage);
+	}
+
+
 
 }
 
@@ -1282,29 +1330,74 @@ void Display_Main_Interface_V_set  (void)
 void Display_Main_Interface_I_set  (void)
 
 {
-
-	Write_String_8x16AsicII(48,56,"ISET");
-	float Voltage=Set_Voltage/100.0;
-	//显示之前电压设定值
-	static char String_Voltage_real[7]={'0','0','0','.','0','0'};
-	if(Voltage>=100)   		sprintf(String_Voltage_real, "%6.2f", Voltage);//将float转为string，保留一位小数
-	else if(Voltage>=9.99)
+	if(Keys_Encoder_Mode==Encoder_Mode)
 	{
-		String_Voltage_real[0]='0';
-		sprintf(&String_Voltage_real[1], "%5.2f", Voltage);//保留两位小数
+		Write_String_8x16AsicII(48,56,"ISET");
+		/*编码器模式下显示上一电压设定值*/
+		float Voltage=Set_Voltage/100.0;
+		static char String_Voltage_real[7]={'0','0','0','.','0','0'};
+		if(Voltage>=100)   		sprintf(String_Voltage_real, "%6.2f", Voltage);//将float转为string，保留一位小数
+		else if(Voltage>=9.99)
+		{
+			String_Voltage_real[0]='0';
+			sprintf(&String_Voltage_real[1], "%5.2f", Voltage);//保留两位小数
+		}
+		else if(Voltage>=0)
+		{
+			String_Voltage_real[0]='0';
+			String_Voltage_real[1]='0';
+			sprintf(&String_Voltage_real[2], "%4.2f", Voltage);
+
+		}
+
+		Write_String_16x32AsicII(16, 0, String_Voltage_real);
+		Write_Single_16x32AsicII(16,24, 'V');
+		/*编码器模式下显示电流设定值*/
+		float Current=String_to_float(String_Current);
+		if(Current>=100)   		sprintf(String_Current, "%6.2f", Current);//将float转为string，保留一位小数
+		else if(Current>=9.99)
+		{
+			String_Current[0]='0';
+			sprintf(&String_Current[1], "%5.2f", Current);//保留两位小数
+		}
+		else if(Current>=0)
+		{
+			String_Current[0]='0';
+			String_Current[1]='0';
+			sprintf(&String_Current[2], "%4.2f", Current);
+
+		}
+		Write_String_16x32AsicII(16,36,String_Current);
+		Write_Single_16x32AsicII(16,60,'A');
+
+
 	}
-	else if(Voltage>=0)
+	else if(Keys_Encoder_Mode==Keys_Mode)
 	{
-		String_Voltage_real[0]='0';
-		String_Voltage_real[1]='0';
-		sprintf(&String_Voltage_real[2], "%4.2f", Voltage);
+		Write_String_8x16AsicII(48,56,"ISET");
+		/*按键模式下显示上一电压设定值*/
+		float Voltage=Set_Voltage/100.0;
+		static char String_Voltage_real[7]={'0','0','0','.','0','0'};
+		if(Voltage>=100)   		sprintf(String_Voltage_real, "%6.2f", Voltage);//将float转为string，保留一位小数
+		else if(Voltage>=9.99)
+		{
+			String_Voltage_real[0]='0';
+			sprintf(&String_Voltage_real[1], "%5.2f", Voltage);//保留两位小数
+		}
+		else if(Voltage>=0)
+		{
+			String_Voltage_real[0]='0';
+			String_Voltage_real[1]='0';
+			sprintf(&String_Voltage_real[2], "%4.2f", Voltage);
 
+		}
+
+		Write_String_16x32AsicII(16, 0, String_Voltage_real);
+		Write_Single_16x32AsicII(16,24, 'V');
+		/*按键模式下显示当前电流设定值*/
+		Write_String_16x32AsicII(16,36,String_Current);
 	}
 
-	Write_String_16x32AsicII(16, 0, String_Voltage_real);
-	Write_Single_16x32AsicII(16,24, 'V');
-	/*显示电流设定值*/
-	Write_String_16x32AsicII(16,36,String_Current);
 
 }
 
@@ -1819,9 +1912,7 @@ void Display_Menu_Function_Interface_Second_Menu(int y,int z)
 void Display_Protect_Interface(uint8_t Error)
 {
 
-	/*解除警报*/
-
-	//v c t p 1 2 4 8
+	Cursor_flash_off();
 	uint8_t mask=0x01;
 	static uint8_t count=0;
 
@@ -2204,7 +2295,7 @@ void Display_Interface(void)
 	/*V_set I_set*/
 	if(xyz.coordinates1==2)
 	{
-		if(xyz.coordinates2==1) 	 Display_Main_Interface_I_set();
+		if(xyz.coordinates2==1 ) 	 Display_Main_Interface_I_set();
 		else if(xyz.coordinates2==2) Display_Main_Interface_V_set();
 	}
 	/*Reacll Save*/

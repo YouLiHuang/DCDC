@@ -21,7 +21,7 @@
 #include "usart.h"
 
 /* USER CODE BEGIN 0 */
-uint8_t Uart2_Send_buffer[7];
+uint8_t Uart2_Send_buffer[9];
 uint8_t Uart2_Receive_buffer[9]={0};
 
 uint8_t Usart1_Buffer_Receive[10];
@@ -442,6 +442,9 @@ void My_Usart3_Config(uint32_t RS232_BaudRate)
 {
 
 }
+
+static float Current_error[100]={0x00};
+
 /**
   * @brief  串口2的接收空闲回调，用于和控制板通信
   * @param  None
@@ -492,6 +495,15 @@ void USART2_IDLECallback(void)
 						Current_Actual=ADC_Gain_I*(Uart2_Receive_buffer[5]*256+Uart2_Receive_buffer[6])+Eror_ADC_I;
 						Current_Actual*=1000;//61mv/A
 						Current_Actual/=61;
+						Current_Actual-=Current_Error;//偏置
+						/*
+						if(Flag.Current_error==1)
+						{
+							Current_error[index++]=Current_Actual;
+							if(index==100)	index=0;
+						}
+						*/
+
 						break;
 					}
 

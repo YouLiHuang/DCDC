@@ -43,7 +43,7 @@ extern UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN Private defines */
 //#define CRC16_CHECK 0x00
-extern uint8_t Uart2_Send_buffer[7];
+extern uint8_t Uart2_Send_buffer[9];
 extern uint8_t Uart2_Receive_buffer[9];
 
 extern uint8_t Usart1_Buffer_Receive[10];

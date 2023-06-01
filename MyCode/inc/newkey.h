@@ -61,6 +61,7 @@ extern FunctionalState  Key_Enable;
 
 /*------------------------------------------------------------------函数声明-------------------------------------------------------------------------*/
 extern float String_To_Float(char* string);
+extern float String_to_float(char* string);
 extern void key_num_handle(int key_number);
 extern void key_scan(void);
 extern void KEY_Handle(void);

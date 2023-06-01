@@ -17,7 +17,7 @@ uint8_t I_Rise_On_Off = I_Rise_Off;
 uint8_t I_Fall_On_Off = I_Fall_Off;
 
 
-extern uint8_t Uart2_Send_buffer[7];
+extern uint8_t Uart2_Send_buffer[9];
 
 #ifdef CRC16_CHECK
 const unsigned char auchCRCHi[]=
@@ -131,26 +131,32 @@ void DAC_Cmd_send(uint8_t IDindex,uint8_t cmd,uint16_t Data_To_Send)
 			  break;
 		  }
 		  /*set min voltage current*/
-		  case 6://set voltage
-		  case 7://set current
+		  case 6://set voltage & current
+		  {
+
+			  Uart2_Send_buffer[4]|=(Set_Voltage&0x00ff);//low voltage
+			  Uart2_Send_buffer[3]|=(Set_Voltage>>8);//Hight voltage
+
+			  Uart2_Send_buffer[6]|=(Set_Current&0x00ff);//low current
+			  Uart2_Send_buffer[5]|=(Set_Current>>8);//Hight current
+			  break;
+
+		  }
+		  /*set V/I rate*/
+		  case 7:
+		  case 8:
+		  {
+			  Uart2_Send_buffer[4]|=(Data_To_Send&0x00ff);//Low min_voltage
+			  break;
+		  }
+		  /*set V I rate*/
+		  case 9:
 		  {
 			  Uart2_Send_buffer[4]|=(Data_To_Send&0x00ff);//Low min_voltage
 			  Uart2_Send_buffer[3]|=(Data_To_Send>>8);//high min_voltage
 			  break;
 		  }
-		  /*set rate*/
-		  case 8://set V rate
-		  case 9://set I rate
-		  {
-			  Uart2_Send_buffer[4]=Data_To_Send;//Low :fall time
-			  break;
-		  }
-		  /*rise/fall ctrl*/
-		  case 10:
-		  {
-			  Uart2_Send_buffer[4]=Data_To_Send;//Low
-			  break;
-		  }//start Rise ON/OFF
+
 		  case 11:break;//start Fall ON/OFF
 
 		  default: break;
@@ -161,11 +167,11 @@ void DAC_Cmd_send(uint8_t IDindex,uint8_t cmd,uint16_t Data_To_Send)
 	  Uart2_Send_buffer[6]=(CRC16(Uart2_Send_buffer,5)>>8);//CRC H
 #endif
 #ifdef ADD_CHECK
-	  Uart2_Send_buffer[5]=ADD(Uart2_Send_buffer,5);//Low
-	  Uart2_Send_buffer[6]=(ADD(Uart2_Send_buffer,5)>>8);//High
+	  Uart2_Send_buffer[7]=ADD(Uart2_Send_buffer,7);//Low
+	  Uart2_Send_buffer[8]=(ADD(Uart2_Send_buffer,7)>>8);//High
 #endif
 
-	  HAL_UART_Transmit_IT(&huart2,Uart2_Send_buffer,7);
+	  HAL_UART_Transmit_IT(&huart2,Uart2_Send_buffer,9);
 
 }
 
@@ -179,9 +185,8 @@ void power_on(void)
 
 
 	ON_OFF =ON;
-	DAC_Cmd_send(1,4,Set_Voltage);
-	HAL_Delay(10);
-	DAC_Cmd_send(1,5,Set_Current);
+	DAC_Cmd_send(1,6,0);
+
 }
 /**
   * @brief  关闭输出
@@ -192,10 +197,10 @@ void power_off(void)
 {
 
 	ON_OFF =OFF;
-	DAC_Cmd_send(1,4,100);
-	for(uint8_t i=0;i<100;i++)
-		;
-	DAC_Cmd_send(1,5,100);
+	Set_Voltage=100;
+	Set_Current=100;
+	DAC_Cmd_send(1,6,0);
+
 
 }
 /**

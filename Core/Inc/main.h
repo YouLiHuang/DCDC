@@ -49,6 +49,7 @@ typedef struct
 			int TIM14_IT;
 			int ERROR_Flag;
 			float FAN_LEVEL;
+			float Current_error;
 
 		}IT_Flag;
 extern IT_Flag Flag;

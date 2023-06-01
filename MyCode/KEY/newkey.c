@@ -59,6 +59,57 @@ const char Password[7]={'1','1','4','5','1','4'};
 /***********************************************************************************************************************************************************************************/
 /*********************************************************************************以下为函数接口*************************************************************************************/
 /***********************************************************************************************************************************************************************************/
+
+float String_to_float(char* string)
+{
+	float value;
+
+		uint8_t point_index=0;
+		uint8_t data_length=0;
+		for(uint8_t i=0;i<strlen(string);i++)
+		{
+			if(string[i]=='.')
+			{
+				point_index=i;
+				break;
+			}
+
+		}
+		if(point_index==0)
+		{
+			for(uint8_t j=0;j<strlen(string);j++)
+			{
+				if(string[j]<='9' && string[j]>='0')
+				{
+					data_length++;
+				}
+
+			}
+			for(uint8_t j=0;j<data_length;j++)
+			{
+				value+=(string[j]-'0')*(float)pow(10,(data_length-j-1));
+			}
+		}
+		else
+		{
+			for(uint8_t j=0;j<point_index;j++)
+			{
+				value+=(string[j]-'0')*(float)pow(10,(point_index-j-1));
+			}
+			for(uint8_t j=1;j<3;j++)
+			{
+				value+=(string[point_index+j]-'0')/(float)pow(10,j);
+			}
+		}
+
+
+		return value;
+
+
+
+
+}
+
 /**
  * @brief  将设定电压电流功率字符数组变为浮点数
  * @param	数组名
@@ -159,31 +210,26 @@ static void Keys_Input_Set_Voltage(char Number)
 	//处于设定电压模式、无锁定和非保护状态
 	if( (xyz.coordinates1==2) && (xyz.coordinates2==2) && (LOCK_UNLOCK == UNLOCK) )
 	{
+		Cursor_flash_off();
 		if(Keys_Encoder_Mode != Keys_Mode)                         //第一次按下按键
 		{
-		  Keys_Encoder_Mode = Keys_Mode;                           //切换到键盘模式
-
+		    Keys_Encoder_Mode = Keys_Mode;                           //切换到键盘模式
+		    Cursor_flash_off();
 			Cursor_Position = 0;                                    //指针设为0位
 
-
-			String_Voltage[3] = '.';
+			String_Voltage[0] = ' ';
+			String_Voltage[1] = ' ';
+			String_Voltage[2] = ' ';
+			String_Voltage[3] = ' ';
+			String_Voltage[4] = ' ';
+			String_Voltage[5] = ' ';
 
 		}
 
-		if(Cursor_Position==2)
-		{
-			String_Voltage[Cursor_Position] = Number;
-			Cursor_Position=4;
-			return;
-		}
-		if(Cursor_Position == 5)
-		{
-			String_Voltage[Cursor_Position] = Number;
-			Cursor_Position = 0;
-			return;
-		}
+
 		String_Voltage[Cursor_Position] = Number;                  //使光标位置置Number
 		Cursor_Position ++;                                        //光标位置加1
+		if(Cursor_Position==6) Cursor_Position=0;
 
 	}
 
@@ -200,26 +246,20 @@ static void Keys_Input_Set_Current(char Number)
 	{
 		if(Keys_Encoder_Mode != Keys_Mode)                         //第一次按下按键
 		{
-		  Keys_Encoder_Mode = Keys_Mode;                           //切换到键盘模式
-
+		    Keys_Encoder_Mode = Keys_Mode;                           //切换到键盘模式
+		    Cursor_flash_off();
 			Cursor_Position = 9;                                    //指针设为0位
 
-			String_Current[3] = '.';
+			String_Current[0] = ' ';
+			String_Current[1] = ' ';
+			String_Current[2] = ' ';
+			String_Current[3] = ' ';
+			String_Current[4] = ' ';
+			String_Current[5] = ' ';
 
 		}
 
-		if(Cursor_Position==11)
-		{
-			String_Current[Cursor_Position-9] = Number;
-			Cursor_Position=13;
-			return;
-		}
-		if(Cursor_Position == 14)
-		{
-			String_Current[Cursor_Position-9] = Number;
-			Cursor_Position = 9;
-			return;
-		}
+
 		String_Current[Cursor_Position-9] = Number;                  //使光标位置置Number
 		Cursor_Position ++;                                        //光标位置加1
 
@@ -241,7 +281,7 @@ static void Keys_Input_Set_V_Rate(char Number)
 		if(Keys_Encoder_Mode != Keys_Mode)                         //第一次按下按键
 		{
 			Keys_Encoder_Mode = Keys_Mode;                           //切换到键盘模式
-
+			Cursor_flash_off();
 			Cursor_Position = 6;                                     //指针设为0位
 
 			String_V_Rate[0] = '0';                                 //初始化
@@ -256,10 +296,6 @@ static void Keys_Input_Set_V_Rate(char Number)
 			String_V_Rate[8] = 's';
 
 		}
-		String_V_Rate[5] = 'V';
-		String_V_Rate[6] = '/';
-		String_V_Rate[7] = 'm';
-		String_V_Rate[8] = 's';
 
 		if(Cursor_Position==0+6)
 		{
@@ -292,7 +328,7 @@ static void Keys_Input_Set_I_Rate(char Number)
 		{
 			Keys_Encoder_Mode = Keys_Mode;                           //切换到键盘模式
 			Cursor_Position = 6;                                     //指针设为0位
-
+			Cursor_flash_off();
 			String_I_Rate[0] = '0';                                  //初始化接收输入的字符串
 			String_I_Rate[1] = '.';
 			String_I_Rate[2] = '0';
@@ -303,10 +339,7 @@ static void Keys_Input_Set_I_Rate(char Number)
 			String_I_Rate[8] = 'm';
 			String_I_Rate[9] = 's';
 		}
-		String_I_Rate[6] = 'A';
-		String_I_Rate[7] = '/';
-		String_I_Rate[8] = 'm';
-		String_I_Rate[9] = 's';
+
 
 		if(Cursor_Position==0+6)
 		{
@@ -339,6 +372,7 @@ static void Keys_Input_RS232(char Number)
 		if(Keys_Encoder_Mode != Keys_Mode)                         //第一次按下按键
 		{
 			Keys_Encoder_Mode = Keys_Mode;                           //切换到键盘模式
+			Cursor_flash_off();
 			Cursor_Position = 0;                                     //指针设为0位
 			String_RS232_ID[0] = ' ';                                 //清空字符串
 			String_RS232_ID[1] = ' ';
@@ -374,6 +408,7 @@ static void Keys_Input_Cycle(char Number)
 		if(Keys_Encoder_Mode != Keys_Mode)                         //第一次按下按键
 		{
 			Keys_Encoder_Mode = Keys_Mode;                           //切换到键盘模式
+			Cursor_flash_off();
 			Cursor_Position = 0+6;                                     //指针设为0位
 		}
 		if( (Cursor_Position<4+6) || ((Cursor_Position>4+6) && (Cursor_Position<8+6)) )
@@ -403,6 +438,7 @@ static void Keys_Input_Cycle(char Number)
 		if(Keys_Encoder_Mode != Keys_Mode)                         //第一次按下按键
 		{
 			Keys_Encoder_Mode = Keys_Mode;                           //切换到键盘模式
+			Cursor_flash_off();
 			Cursor_Position = 0+6;                                     //指针设为0位
 
 		}
@@ -444,6 +480,7 @@ static void Keys_Input_Delay(char Number)
 		if(Keys_Encoder_Mode != Keys_Mode)                         //第一次按下按键
 		{
 			Keys_Encoder_Mode = Keys_Mode;                           //切换到键盘模式
+			Cursor_flash_off();
 			Cursor_Position = 6;                                     //指针设为0位
 		}
 
@@ -474,7 +511,23 @@ static void Keys_Input_Save(char Number)
 		if(Keys_Encoder_Mode != Keys_Mode)                         //第一次按下按键
 		{
 			Keys_Encoder_Mode = Keys_Mode;                           //切换到键盘模式
+			Cursor_flash_off();
 			Cursor_Position = 0;                                     //指针设为0位
+			String_Save_V[0]=' ';
+			String_Save_V[1]=' ';
+			String_Save_V[2]=' ';
+			String_Save_V[3]=' ';
+			String_Save_V[4]=' ';
+			String_Save_V[5]=' ';
+
+			String_Save_I[0]=' ';
+			String_Save_I[1]=' ';
+			String_Save_I[2]=' ';
+			String_Save_I[3]=' ';
+			String_Save_I[4]=' ';
+			String_Save_I[5]=' ';
+
+
 		}
 		if(xyz.coordinates3==1)//voltage set
 		{
@@ -512,7 +565,10 @@ static void Keys_Input_Save(char Number)
 			Cursor_Position++;
 		}
 
+
 	}
+
+
 }
 
 static void Keys_Input_Recall(char Number)
@@ -553,6 +609,7 @@ static void Keys_Input_Calibration_Voltage(char Number)
 		if(Keys_Encoder_Mode != Keys_Mode)                         //第一次按下按键
 		{
 			Keys_Encoder_Mode = Keys_Mode;                           //切换到键盘模式
+			Cursor_flash_off();
 
 			Cursor_Position = 9;                                    //指针设为0位
 
@@ -587,6 +644,7 @@ static void Keys_Input_Calibration_Current(char Number)
 		if(Keys_Encoder_Mode != Keys_Mode)                         //第一次按下按键
 		{
 			Keys_Encoder_Mode = Keys_Mode;                           //切换到键盘模式
+			Cursor_flash_off();
 
 			Cursor_Position = 9;                                    //指针设为0位
 
@@ -949,31 +1007,31 @@ static void ISET_enter(void)
 {
 	if(Keys_Encoder_Mode==Encoder_Mode)
 	{
-		Set_Current = String_To_Float(String_Current)*100;
+		//Set_Current = String_To_Float(String_Current)*100;
+		Set_Current=String_to_float(String_Current)*100;
 		if(Set_Current > 5000) Set_Current = 5000;//50A
 		if(Set_Current<=100)   Set_Current=100;
 		AT25_Save_VISet();
 
-		DAC_Cmd_send(1,4,Set_Voltage);
-		HAL_Delay(5);
-		DAC_Cmd_send(1,5,Set_Current);
+
 
 		if((OUTPUT_NOT_OUTPUT == OUTPUT) && (DELAY_NOT_DELAY == NOT_DELAY) && (ON_OFF == ON))//处于非延时输出
 		{
 
 			DAC_Cmd_send(1,5,Set_Current);
 		}
-		xyz.coordinates1=0;
-		xyz.coordinates2=0;
-		xyz.coordinates3=0;
-		Cursor_Position=0;
-		Cursor_flash_off();
+
+		Cursor_Position=9;
+		Keys_Encoder_Mode=Encoder_Mode;
+		Cursor_flash_on();
+
 	}
 	else if(Keys_Encoder_Mode==Keys_Mode)
 	{
 		Keys_Encoder_Mode = Encoder_Mode;//恢复为编码器输入模式
 
-		Set_Current = String_To_Float(String_Current)*100;
+		//Set_Current = String_To_Float(String_Current)*100;
+		Set_Current=String_to_float(String_Current)*100;
 		if(Set_Current > 5000) Set_Current = 5000;//50A
 		if(Set_Current<=100)   Set_Current=100;
 		AT25_Save_VISet();
@@ -984,12 +1042,10 @@ static void ISET_enter(void)
 			HAL_Delay(5);
 			DAC_Cmd_send(1,5,Set_Current);
 		}
-		xyz.coordinates1=0;
-		xyz.coordinates2=0;
-		xyz.coordinates3=0;
-		Cursor_Position=0;
+
+		Cursor_Position=9;
 		Keys_Encoder_Mode=Encoder_Mode;
-		Cursor_flash_off();
+		Cursor_flash_on();
 	}
 
 }
@@ -998,9 +1054,16 @@ static void VSET_enter(void)
 {
 	if(Keys_Encoder_Mode==Encoder_Mode)
 	{
-		Set_Voltage = String_To_Float(String_Voltage)*100;   //更新设定电压
-		if(Set_Voltage > 15000) Set_Voltage = 15000;  //限制电压最大值为150V
-		if(Set_Voltage<100||Set_Voltage==100)	Set_Voltage=100;
+
+		Set_Voltage = String_to_float(&String_Voltage[0])*100;
+		if(Set_Voltage > 15000)
+		{
+			Set_Voltage = 15000;  //限制电压最大值为150V
+		}
+		if(Set_Voltage<=100)
+		{
+			Set_Voltage=100;
+		}
 
 
 		AT25_Save_VISet();
@@ -1017,9 +1080,10 @@ static void VSET_enter(void)
 	{
 		Keys_Encoder_Mode = Encoder_Mode;   //恢复为编码器输入模式
 
-		Set_Voltage = String_To_Float(String_Voltage)*100;
+		//Set_Voltage = String_To_Float(String_Voltage)*100;
+		Set_Voltage = String_to_float(&String_Voltage[0])*100;
 		if(Set_Voltage > 15000) Set_Voltage = 15000;  //限制电压最大值为150V
-		if(Set_Voltage<100||Set_Voltage==100)	Set_Voltage=100;
+		//if(Set_Voltage<100||Set_Voltage==100)	Set_Voltage=100;
 
 		AT25_Save_VISet();
 		if((OUTPUT_NOT_OUTPUT == OUTPUT) && (DELAY_NOT_DELAY == NOT_DELAY) && (ON_OFF == ON))
@@ -1029,6 +1093,8 @@ static void VSET_enter(void)
 
 		xyz.coordinates2=1;//change to I set
 		Cursor_Position=9;//光标更新
+		Keys_Encoder_Mode= Encoder_Mode;
+		Cursor_flash_on();
 
 	}
 }
@@ -1067,8 +1133,8 @@ static void Password_enter(void)
 static void IRateSET_enter(void)
 {
 	/*此处补充指令修改控制板的rate*/
-	Set_V_Slope=String_To_Float(String_I_Rate);
-	DAC_Cmd_send(1,9,Set_I_Slope*10);
+	Set_I_Slope=String_To_Float(&String_I_Rate[0])*10;
+	DAC_Cmd_send(1,8,Set_I_Slope);
 	AT25_Save_VI_Rate();
 	Third_Menu_Flag=1;
 
@@ -1081,8 +1147,8 @@ static void IRateSET_enter(void)
 static void VRateSET_enter(void)
 {
 	/*此处补充指令修改控制板的rate*/
-	Set_V_Slope=String_To_Float(String_V_Rate)*10;
-	DAC_Cmd_send(1,8,Set_V_Slope);
+	Set_V_Slope=String_To_Float(&String_V_Rate[0])*10;
+	DAC_Cmd_send(1,7,Set_V_Slope);
 	AT25_Save_VI_Rate();
 	Third_Menu_Flag=1;
 
@@ -1093,8 +1159,17 @@ static void VRateSET_enter(void)
 
 static void Save_enter(void)
 {
+	/*
 	Recall_Save_Voltage[Recall_Save_Number]=String_To_Float(String_Save_V);//将交互界面的数值进行转换
 	Recall_Save_Current[Recall_Save_Number]=String_To_Float(String_Save_I);
+	*/
+
+
+	/*新的实现*/
+	Recall_Save_Voltage[Recall_Save_Number]=String_to_float(String_Save_V);//将交互界面的数值进行转换
+	Recall_Save_Current[Recall_Save_Number]=String_to_float(String_Save_I);
+
+
 	Recall_Save_Power[Recall_Save_Number]=Recall_Save_Voltage[Recall_Save_Number]*Recall_Save_Current[Recall_Save_Number];
 	AT25_Save_Recall_Save_VI(Recall_Save_Number);
 
@@ -1219,7 +1294,7 @@ static void Reset_enter(void)
 
 	AT25_Reset();
 	DAC_Cmd_send(1,11,0);
-	HAL_Delay(10);//等控制板复位完成
+	HAL_Delay(100);//等待子板复位
 	NVIC_SystemReset();
 	xyz.coordinates1=0;
 	xyz.coordinates2=0;
@@ -1392,7 +1467,7 @@ void Key_Enter(void)
 			data_I[1]=Uart2_Receive_buffer[5]*256+Uart2_Receive_buffer[6];
 			Iref[1]=String_To_Float(String_Calibration_Current);
 			ADC_Gain_I=(Iref[1]-Iref[0])/(data_I[1]-data_I[0]);
-			//AT25_Save_AD_Param();
+			AT25_Save_AD_Param();
 			Eror_ADC_I=Iref[0]-ADC_Gain_I*data_I[0];
 			return;
 		}

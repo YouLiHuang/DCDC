@@ -405,10 +405,10 @@ void AT25_Save_AD_Param(void)
 	uint16_t temp[4];
 
 	temp[0] = ADC_Gain_V*1000000;
-	temp[1] = temp[0];
+	temp[1] = ADC_Gain_I*1000000;
 	/*test*/
 	temp[2] = (-1*Eror_ADC_V)*10000;
-	temp[3] = (-1*Eror_ADC_V)*10000;
+	temp[3] = (-1*Eror_ADC_I)*10000;
 
 	SPI_AT25_Write(temp, 86, sizeof(temp));
 

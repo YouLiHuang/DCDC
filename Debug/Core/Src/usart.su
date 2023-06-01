@@ -6,4 +6,4 @@
 ../Core/Src/usart.c:411:6:Usart1_Display_Data_Value	40	static
 ../Core/Src/usart.c:431:6:Usart1_Display_String	16	static
 ../Core/Src/usart.c:441:6:My_Usart3_Config	16	static
-../Core/Src/usart.c:450:6:USART2_IDLECallback	16	static
+../Core/Src/usart.c:453:6:USART2_IDLECallback	16	static

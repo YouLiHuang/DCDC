@@ -658,6 +658,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if(htim==&htim1)
 	{
 		keys_EN = ENABLE;//ENABLE按键
+		Flag.Current_error=0;
+		/*补充校准程序*/
 		__HAL_TIM_ENABLE(&htim3);
 		__HAL_TIM_ENABLE_IT(&htim3, TIM_IT_UPDATE);
 		HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);

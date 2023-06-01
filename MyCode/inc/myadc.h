@@ -7,7 +7,7 @@
 
 #define READ_VOLTAGE 0x01
 #define READ_CURRENT 0x02
-
+#define Current_Error 2.21
 
 extern uint16_t ADC_frequency;
 extern float ADC_Gain_V;
