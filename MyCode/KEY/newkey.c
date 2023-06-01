@@ -7,15 +7,12 @@ uint8_t Shift_Not_Shift = Not_Shift;                                            
 uint8_t ON_OFF = OFF;                                                            //定义输出关闭标志位（默认不输出,只是用来显示）
 uint8_t OUTPUT_NOT_OUTPUT = NOT_OUTPUT;                                          //定义是否已经输出标志位
 uint8_t CV_CC_CP = 0x00;                                                           //定义输出类型标志位 (默认恒压输出)
-uint8_t CYCLE_NOT_CYCLE = NOT_CYCLE;                                             //定义方波标志位（默认正常输出）
-uint8_t DELAY_NOT_DELAY = NOT_DELAY;                                             //定义延时标志位（默认不延时）
+
 uint8_t LOCK_UNLOCK = UNLOCK;                                                    //定义锁定标志位（默认不锁定）
-uint8_t Recall_Save = Recall;                                                    //定义读取保存标志位（默认为读取）
+
 uint8_t Third_Menu_Flag=1;														 //定义三级菜单下完成设定标志
 uint8_t COUNT_ESC=0;															 //ESC按键统计值
 uint8_t Sleep_ON_OFF=0xff;
-
-
 
 uint8_t Keys_Encoder_Mode = Encoder_Mode;                                        //定义用键盘输入还是用编码器输入(默认用编码器输入)
 uint8_t RS232_BaudRate_State = 0;                                                //定义设定波特率状态
@@ -27,9 +24,8 @@ uint16_t Cycle_On_ms = 300;                                                     
 uint16_t Cycle_Close_s = 0;                                                      //定义循环关闭时间的秒
 uint16_t Cycle_Close_ms = 300;                                                     //定义循环关闭时间的毫秒
 
-uint8_t Delay_h;                                                                  //定义延时的时
-uint8_t Delay_m;                                                                  //定义延时的分
-uint8_t Delay_s;                                                                  //定义延时的秒
+uint16_t Delay_s;                                                                  //定义延时的秒
+uint16_t Delay_ms;                                                                  //定义延时的秒
 
 uint8_t Set_V_Slope;//设定的电压变化率
 uint8_t Set_I_Slope;//设定的电流变化率
@@ -45,13 +41,11 @@ float Iref[2]={0x00};
 uint16_t data_V[2]={0x00};
 uint16_t data_I[2]={0x00};
 
-
-/**/
+/*key scan*/
 uint16_t Key_Value1=0x7f;
 uint16_t Key_Value2=0x7f;
 uint16_t Key_Value3=0x7f;
-
-
+/*key flag*/
 int Row_Flag=0;
 FunctionalState  Key_Enable=DISABLE;
 const char Password[7]={'1','1','4','5','1','4'};
@@ -62,7 +56,7 @@ const char Password[7]={'1','1','4','5','1','4'};
 
 float String_to_float(char* string)
 {
-	float value;
+		float value=0.0;
 
 		uint8_t point_index=0;
 		uint8_t data_length=0;
@@ -92,6 +86,8 @@ float String_to_float(char* string)
 		}
 		else
 		{
+			/*旧版 有bug*/
+			/*
 			for(uint8_t j=0;j<point_index;j++)
 			{
 				value+=(string[j]-'0')*(float)pow(10,(point_index-j-1));
@@ -100,6 +96,25 @@ float String_to_float(char* string)
 			{
 				value+=(string[point_index+j]-'0')/(float)pow(10,j);
 			}
+			*/
+			/*新版*/
+			for(uint8_t i=0;i<point_index;i++)
+			{
+				value+=(string[i]-'0')*pow(10,(point_index+1-i));
+			}
+			/*小数后两位*/
+			for(uint8_t j=1;j<3;j++)
+			{
+				if(string[j+point_index]!=' ')
+				{
+					value+=(string[j+point_index]-'0')*pow(10,2-j);
+				}
+				else value+=0;
+
+			}
+			value/=100.0;
+
+
 		}
 
 
@@ -1010,12 +1025,12 @@ static void ISET_enter(void)
 		//Set_Current = String_To_Float(String_Current)*100;
 		Set_Current=String_to_float(String_Current)*100;
 		if(Set_Current > 5000) Set_Current = 5000;//50A
-		if(Set_Current<=100)   Set_Current=100;
+		if(Set_Current<=10)   Set_Current=10;
 		AT25_Save_VISet();
 
 
 
-		if((OUTPUT_NOT_OUTPUT == OUTPUT) && (DELAY_NOT_DELAY == NOT_DELAY) && (ON_OFF == ON))//处于非延时输出
+		if((OUTPUT_NOT_OUTPUT == OUTPUT) && (Delay_Function_On_Off==Delay_Function_Off))//处于非延时输出
 		{
 
 			DAC_Cmd_send(1,5,Set_Current);
@@ -1036,7 +1051,7 @@ static void ISET_enter(void)
 		if(Set_Current<=100)   Set_Current=100;
 		AT25_Save_VISet();
 
-		if((OUTPUT_NOT_OUTPUT == OUTPUT) && (DELAY_NOT_DELAY == NOT_DELAY) && (ON_OFF == ON))//处于非延时输出模式
+		if((OUTPUT_NOT_OUTPUT == OUTPUT) && (Delay_Function_On_Off==Delay_Function_Off))//处于非延时输出模式
 		{
 			DAC_Cmd_send(1,4,Set_Voltage);
 			HAL_Delay(5);
@@ -1060,14 +1075,14 @@ static void VSET_enter(void)
 		{
 			Set_Voltage = 15000;  //限制电压最大值为150V
 		}
-		if(Set_Voltage<=100)
+		if(Set_Voltage<=10)
 		{
-			Set_Voltage=100;
+			Set_Voltage=10;
 		}
 
 
 		AT25_Save_VISet();
-		if((OUTPUT_NOT_OUTPUT == OUTPUT) && (DELAY_NOT_DELAY == NOT_DELAY) && (ON_OFF == ON))//非延时输出
+		if((OUTPUT_NOT_OUTPUT == OUTPUT) && (Delay_Function_On_Off==Delay_Function_Off) )//非延时输出
 		{
 			DAC_Cmd_send(1,4,Set_Voltage);
 		}
@@ -1080,13 +1095,12 @@ static void VSET_enter(void)
 	{
 		Keys_Encoder_Mode = Encoder_Mode;   //恢复为编码器输入模式
 
-		//Set_Voltage = String_To_Float(String_Voltage)*100;
+
 		Set_Voltage = String_to_float(&String_Voltage[0])*100;
 		if(Set_Voltage > 15000) Set_Voltage = 15000;  //限制电压最大值为150V
-		//if(Set_Voltage<100||Set_Voltage==100)	Set_Voltage=100;
 
 		AT25_Save_VISet();
-		if((OUTPUT_NOT_OUTPUT == OUTPUT) && (DELAY_NOT_DELAY == NOT_DELAY) && (ON_OFF == ON))
+		if((OUTPUT_NOT_OUTPUT == OUTPUT) && (Delay_Function_On_Off==Delay_Function_Off) )
 		{
 			DAC_Cmd_send(1,4,Set_Voltage);
 		}
@@ -1173,7 +1187,7 @@ static void Save_enter(void)
 	Recall_Save_Power[Recall_Save_Number]=Recall_Save_Voltage[Recall_Save_Number]*Recall_Save_Current[Recall_Save_Number];
 	AT25_Save_Recall_Save_VI(Recall_Save_Number);
 
-	if((OUTPUT_NOT_OUTPUT == OUTPUT) && (DELAY_NOT_DELAY == NOT_DELAY) && (ON_OFF == ON))     //处于输出模式并且延时时间结束,当改变设定值以后要改变输出电压
+	if((OUTPUT_NOT_OUTPUT == OUTPUT) && (Delay_Function_On_Off==Delay_Function_Off) )     //处于输出模式并且延时时间结束,当改变设定值以后要改变输出电压
 	{
 		power_on();
 	}
@@ -1186,26 +1200,19 @@ static void Load_enter(void)
 	xyz.coordinates3=1;
 	Recall_Save_Voltage[Recall_Save_Number]=AT25_Save_Recall_Recall_VI(Recall_Save_Number)/100.0;
 	Set_Voltage=AT25_Save_Recall_Recall_VI(Recall_Save_Number);
-	DAC_Cmd_send(1,4,Set_Voltage);
-	HAL_Delay(10);
+
+
 	xyz.coordinates3=2;
 	Recall_Save_Current[Recall_Save_Number]=AT25_Save_Recall_Recall_VI(Recall_Save_Number)/100.0;
 	Set_Current=AT25_Save_Recall_Recall_VI(Recall_Save_Number);
-	DAC_Cmd_send(1,5,Set_Current);
-	/*
-	Recall_Save_Power[Recall_Save_Number]=AT25_Save_Recall_Recall_VI(Recall_Save_Number);
-	Set_Power=Recall_Save_Power[Recall_Save_Number];
-	 */
 
-	if((OUTPUT_NOT_OUTPUT == OUTPUT) && (DELAY_NOT_DELAY == NOT_DELAY) && (ON_OFF == ON))     //处于输出模式并且延时时间结束,当改变设定值以后要改变输出电压
+
+	if((OUTPUT_NOT_OUTPUT == OUTPUT) && (Delay_Function_On_Off==Delay_Function_Off) )     //处于输出模式并且延时时间结束,当改变设定值以后要改变输出电压
 	{
-		//power_on();
+		power_on();
 	}
 
 	Cursor_Position=0;//光标复位
-	xyz.coordinates1=0;
-	xyz.coordinates2=0;
-	xyz.coordinates3=0;
 	Cursor_flash_off();
 
 }
@@ -1213,16 +1220,12 @@ static void Load_enter(void)
 static void Delay_enter(void)
 {
 
-	Delay_h = (String_Delay[0] - '0') * 10 + (String_Delay[1] - '0');
-	Delay_m = (String_Delay[3] - '0') * 10 + (String_Delay[4] - '0');
-	Delay_s = (String_Delay[6] - '0') * 10 + (String_Delay[7] - '0');
-	if(Delay_h > 99) Delay_h = 99;
-	if(Delay_m > 59) Delay_m = 59;
-	if(Delay_s > 59) Delay_s = 59;
+	Delay_s=(String_Delay[0] - '0') * 1000 + (String_Delay[1] - '0')*100+ (String_Delay[2] - '0')*10+ (String_Delay[3] - '0');
+	Delay_ms=(String_Delay[5] - '0') * 100 + (String_Delay[6] - '0')*10+ (String_Delay[7] - '0');
 
 	Keys_Encoder_Mode = Encoder_Mode;
-	if((Delay_h == 0) && (Delay_m == 0) && (Delay_s == 0)) Delay_Function_On_Off = Delay_Function_Off;
-	else if(Delay_Function_On_Off == Delay_Function_Off)   Delay_Function_On_Off = Delay_Function_On;
+	if((Delay_s == 0) && (Delay_ms == 0)) Delay_Function_On_Off = Delay_Function_Off;
+	else    							  Delay_Function_On_Off = Delay_Function_On;
 
 	AT25_Save_Delay();
 
@@ -1263,23 +1266,20 @@ static void Cycle_enter(void)
 	if(((Cycle_On_s == 0) && (Cycle_On_ms == 0)) || ((Cycle_Close_s == 0) && (Cycle_Close_ms == 0)))
 	{
 		Cycle_Function_On_Off = Cycle_Function_Off;
-		CYCLE_NOT_CYCLE = NOT_CYCLE;
 	}
-	else if((Cycle_On_s != 0) || (Cycle_On_ms != 0) || (Cycle_Close_s != 0) || (Cycle_Close_ms != 0))
+	else if( (Cycle_On_s != 0 || Cycle_On_ms != 0) && (Cycle_Close_s != 0 || Cycle_Close_ms != 0) )
 	{
 		Cycle_Function_On_Off = Cycle_Function_On;
-		CYCLE_NOT_CYCLE = CYCLE;
+
 	}
 	AT25_Save_Cycle();
 
-	//输出
+
 	if(OUTPUT_NOT_OUTPUT == OUTPUT)
 	{
 		/*先输出零，延时一段时间后开始循环输出*/
 		Output_Zero();
-		if(Delay_Function_On_Off == Delay_Function_On) TIM16_DELAY_ON();
-		else if(Cycle_Function_On_Off == Cycle_Function_On) TIM17_CYCLE_ON();
-		else power_on();//直接输出
+
 	}
 
 	if(xyz.coordinates3==3)	xyz.coordinates3=1;
@@ -1293,28 +1293,28 @@ static void Reset_enter(void)
 {
 
 	AT25_Reset();
-	DAC_Cmd_send(1,11,0);
-	HAL_Delay(100);//等待子板复位
-	NVIC_SystemReset();
-	xyz.coordinates1=0;
-	xyz.coordinates2=0;
-	xyz.coordinates3=0;//完成后设定，更新为显示实时值界面
-	Cursor_Position=0;//光标复位
+
+	static uint8_t count=1;
+
+	if(count==3)
+	{
+		count=1;
+		NVIC_SystemReset();
+	}
+	else if(count==2)
+	{
+		DAC_Cmd_send(1,12,0);
+
+	}
+
 	Cursor_flash_off();
 
+	count++;
 }
 
 static void Frq_enter(void)
 {
-	ADC_frequency = String_To_Float(String_AD_Frq);
-	/*此处补充修改参数的指令cmd*/
-	AT25_Save_AD_Param();
-	Third_Menu_Flag=1;
-	xyz.coordinates1=0;
-	xyz.coordinates2=0;
-	xyz.coordinates3=0;//完成后设定，更新为显示隐藏界面
-	Cursor_Position=6;//光标复位
-	Cursor_flash_off();
+	;
 }
 
 static void Sample_show_enter(void)
@@ -1345,10 +1345,7 @@ void Key_Enter(void)
 	{
 		if((xyz.coordinates1==0) && (xyz.coordinates2==0) && (xyz.coordinates3==0))
 		{
-			/*
-			if(Inner_Mode==ENABLE) Inner_Mode=DISABLE;
-			else if(Inner_Mode==DISABLE) Inner_Mode=ENABLE;
-			*/
+			DAC_Cmd_send(1,2,0x01);
 		}
 		/*first menu enter second menu*/
 		if( xyz.coordinates1==1 && (xyz.coordinates3==0) )//当处于第一级菜单,按下enter进入二级菜单
@@ -1495,6 +1492,74 @@ void Key_Shift(void)
 		if(Shift_Not_Shift == Not_Shift)          Shift_Not_Shift = Shift;//如果没复用，就复用
 		else if(Shift_Not_Shift == Shift)         Shift_Not_Shift = Not_Shift; //如果复用了，就取消复用
 	}
+
+	if(xyz.coordinates1==2 && xyz.coordinates2!=0 && xyz.coordinates3==0)
+	{
+		/*vset*/
+		if(xyz.coordinates2==2)
+		{
+			if(Keys_Encoder_Mode==Encoder_Mode)
+			{
+				Cursor_Position=0;
+				Cursor_flash_on();
+
+				String_Voltage[0]=' ';
+				String_Voltage[1]=' ';
+				String_Voltage[2]=' ';
+				String_Voltage[3]=' ';
+				String_Voltage[4]=' ';
+				String_Voltage[5]=' ';
+				String_Voltage[6]='V';
+
+			}
+			else if(Keys_Encoder_Mode==Keys_Mode)
+			{
+				Cursor_flash_off();
+				Cursor_Position=0;
+				String_Voltage[0]=' ';
+				String_Voltage[1]=' ';
+				String_Voltage[2]=' ';
+				String_Voltage[3]=' ';
+				String_Voltage[4]=' ';
+				String_Voltage[5]=' ';
+				String_Voltage[6]='V';
+
+			}
+
+		}
+		/*Iset*/
+		else if(xyz.coordinates2==1)
+		{
+			if(Keys_Encoder_Mode==Encoder_Mode)
+			{
+				Cursor_Position=9;
+				Cursor_flash_on();
+				String_Current[0]=' ';
+				String_Current[1]=' ';
+				String_Current[2]=' ';
+				String_Current[3]=' ';
+				String_Current[4]=' ';
+				String_Current[5]=' ';
+				String_Current[6]='A';
+
+			}
+			else if(Keys_Encoder_Mode==Keys_Mode)
+			{
+				Cursor_flash_off();
+				Cursor_Position=9;
+				String_Current[0]=' ';
+				String_Current[1]=' ';
+				String_Current[2]=' ';
+				String_Current[3]=' ';
+				String_Current[4]=' ';
+				String_Current[5]=' ';
+				String_Current[6]='A';
+			}
+		}
+
+	}
+
+
 }
 
 /**
@@ -1511,6 +1576,12 @@ void Key_ON_OFF(void)
 		if(OUTPUT_NOT_OUTPUT ==NOT_OUTPUT)
 		{
 			OUTPUT_NOT_OUTPUT =OUTPUT;
+			if(Delay_Function_On_Off==Delay_Function_On)
+			{
+				TIM16_DELAY_ON();
+				return;
+			}
+
 			power_on();
 
 		}
@@ -1521,44 +1592,7 @@ void Key_ON_OFF(void)
 		}
 
 	}
-	/* timer */
-	if( (xyz.coordinates1==1) && (xyz.coordinates2==4) && (xyz.coordinates3!=0))
-	{
-		switch(xyz.coordinates3)
-		{
-			case 1:
-			{
-				if(DELAY_NOT_DELAY==NOT_DELAY)
-				{
-					DELAY_NOT_DELAY=DELAY;
-					break;
-				}
-				else if(DELAY_NOT_DELAY==DELAY)
-				{
-					DELAY_NOT_DELAY=NOT_DELAY;
-					break;
-				}
 
-			}
-			case 2:
-			case 3:
-			{
-				if(CYCLE_NOT_CYCLE==CYCLE)
-				{
-					CYCLE_NOT_CYCLE=NOT_CYCLE;
-				}
-				else if(CYCLE_NOT_CYCLE==NOT_CYCLE)
-				{
-					CYCLE_NOT_CYCLE=CYCLE;
-				}
-
-				break;
-			}
-
-		}
-
-
-	}
 
 }
 
@@ -1571,6 +1605,7 @@ void Key_Preset_Lock(void)
 {
 	if(Shift_Not_Shift == Not_Shift)//当不复用该按键时，该按键为切换功能，切换实时值和设定值界面
 	{
+		Cursor_flash_off();
 		xyz.coordinates1=9;
 		xyz.coordinates2=9;
 		xyz.coordinates3=9;
@@ -1867,6 +1902,7 @@ void Key_ESC(void)
 	if((xyz.coordinates1==0) && (xyz.coordinates2==0) && (xyz.coordinates3==0))
 	{
 		COUNT_ESC++;
+		return;
 	}
 	/*first menu*/
 	if( xyz.coordinates1==1 && (xyz.coordinates3==0) )
@@ -1926,7 +1962,7 @@ void Key_ESC(void)
 		xyz.coordinates3=0;
 		Cursor_flash_off();
 	}
-	//Write_String_8x16AsicII(32,38,"          ");
+
 	Cursor_flash_off();
 
 

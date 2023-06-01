@@ -1,9 +1,9 @@
 ../MyCode/DAC/DAC.c:79:10:ADD	32	static
 ../MyCode/DAC/DAC.c:98:6:DAC_Cmd_send	24	static
-../MyCode/DAC/DAC.c:183:6:power_on	8	static
-../MyCode/DAC/DAC.c:196:6:power_off	8	static
-../MyCode/DAC/DAC.c:211:6:Output_Zero	8	static
-../MyCode/DAC/DAC.c:224:6:Slope_Function_On_default	8	static
-../MyCode/DAC/DAC.c:245:6:Slope_Function_Off_default	8	static
-../MyCode/DAC/DAC.c:267:6:Slope_Function_On	8	static
-../MyCode/DAC/DAC.c:297:6:Slope_Function_Off	8	static
+../MyCode/DAC/DAC.c:184:6:power_on	8	static
+../MyCode/DAC/DAC.c:197:6:power_off	16	static
+../MyCode/DAC/DAC.c:215:6:Output_Zero	16	static
+../MyCode/DAC/DAC.c:233:6:Slope_Function_On_default	8	static
+../MyCode/DAC/DAC.c:254:6:Slope_Function_Off_default	8	static
+../MyCode/DAC/DAC.c:276:6:Slope_Function_On	8	static
+../MyCode/DAC/DAC.c:306:6:Slope_Function_Off	8	static

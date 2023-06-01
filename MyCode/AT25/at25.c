@@ -328,19 +328,13 @@ void AT25_Save_RS232(void)
  */
 void AT25_Save_Delay(void)
 {
-	uint8_t temp[4];
-	uint8_t temp_1[2];
+	uint16_t temp[2];
 
-	temp[0] = Delay_h;
-	temp[1] = Delay_m;
-	temp[2] = Delay_s;
-	temp[3] = 0x00;
+	temp[0] = Delay_s;
+	temp[1] = Delay_ms;
 
-	temp_1[0] = Delay_Function_On_Off;
-	temp_1[1] = 0x00;
 
 	SPI_AT25_Write((uint16_t*)temp, 78, sizeof(temp));
-	SPI_AT25_Write((uint16_t*)temp_1, 108, sizeof(temp_1));
 }
 
 /**
@@ -352,18 +346,13 @@ void AT25_Save_Cycle(void)
 {
 	uint16_t temp[4];
 
-	uint8_t temp_1[2];
-
 	temp[0] = Cycle_On_s;
 	temp[1] = Cycle_On_ms;
 	temp[2] = Cycle_Close_s;
 	temp[3] = Cycle_Close_ms;
 
-	temp_1[0] = Cycle_Function_On_Off;
-	temp_1[1] = 0x00;
-
 	SPI_AT25_Write(temp, 82, sizeof(temp));
-	SPI_AT25_Write((uint16_t*)temp_1, 110, sizeof(temp_1));
+
 }
 
 /**
@@ -566,8 +555,7 @@ static void AT25_Load_Delay(void)
 	SPI_AT25_Read((uint16_t*)temp, 78, sizeof(temp));
 	SPI_AT25_Read((uint16_t*)temp_1, 108, sizeof(temp_1));
 
-	Delay_h = temp[0];
-	Delay_m = temp[1];
+
 	Delay_s = temp[2];
 
 	Delay_Function_On_Off = temp_1[0];
@@ -639,6 +627,8 @@ void AT25_Load_Data(void)
 		AT25_Reset();
 	}
 */
+
+	AT25_load_AD_Param();
 	AT25_Load_VISet();
 	AT25_Load_RecallSaveSet();
 	AT25_Load_RS232();

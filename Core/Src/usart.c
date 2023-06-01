@@ -495,7 +495,7 @@ void USART2_IDLECallback(void)
 						Current_Actual=ADC_Gain_I*(Uart2_Receive_buffer[5]*256+Uart2_Receive_buffer[6])+Eror_ADC_I;
 						Current_Actual*=1000;//61mv/A
 						Current_Actual/=61;
-						Current_Actual-=Current_Error;//偏置
+						//Current_Actual-=Current_Error;//偏置
 						/*
 						if(Flag.Current_error==1)
 						{

@@ -220,8 +220,6 @@ extern void Display_Main_Interface( const float Voltage,
 									const float Current,
 									const uint8_t ON_OFF,
 									const uint8_t CV_CC_CP,
-									const uint8_t CYCLE_NOT_CYCLE,
-									const uint8_t DELAY_NOT_DELAY,
 									const uint8_t Preset_Actual,
 									const uint8_t LOCK_UNLOCK,
 									const uint8_t Shift_NotShift);

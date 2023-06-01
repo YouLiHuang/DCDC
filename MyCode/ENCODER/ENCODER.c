@@ -188,6 +188,20 @@ static void Calibration_I_data_Refresh(void)
 static void Vset_data_Refresh(void)
 {
 	String_Voltage[Cursor_Position]+=Flag.Encoder_BF;
+	if(Cursor_Position==3||Cursor_Position==4)
+	{
+		if(String_Voltage[Cursor_Position]<'0')
+		{
+			String_Voltage[Cursor_Position]='0';
+			return;
+		}
+		if(String_Voltage[Cursor_Position]>'9')
+		{
+			String_Voltage[Cursor_Position]='9';
+			return;
+		}
+	}
+
 	if(String_Voltage[Cursor_Position]<'0')
 	{
 		/*第三位退位*/
@@ -283,6 +297,19 @@ static void Vset_data_Refresh(void)
 static void Iset_data_Refresh(void)
 {
 	String_Current[Cursor_Position-9]+=Flag.Encoder_BF;
+	if(Cursor_Position==13||Cursor_Position==14)
+	{
+		if(String_Current[Cursor_Position-9]<'0')
+		{
+			String_Current[Cursor_Position-9]='0';
+			return;
+		}
+		if(String_Current[Cursor_Position-9]>'9')
+		{
+			String_Current[Cursor_Position-9]='9';
+			return;
+		}
+	}
 	if(String_Current[Cursor_Position-9]<'0')//退位
 	{
 		/*第三位退位*/

@@ -41,7 +41,7 @@ void Check_Error()
 	static uint8_t ERROR_Flag=1;
 	static uint8_t ERROR_Flag2=1;
 	static uint8_t ERROR_Flag3=1;
-	static uint8_t ERROR_Flag4=1;
+
 
 	if(Voltage_Actual>100)
 	{

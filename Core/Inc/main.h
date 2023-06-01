@@ -48,6 +48,7 @@ typedef struct
 			int Encoder_BF;
 			int TIM14_IT;
 			int ERROR_Flag;
+			int SLEEP_ON_OFF;
 			float FAN_LEVEL;
 			float Current_error;
 

@@ -1,5 +1,4 @@
 ../MyCode/PROTECT/time_delay_cycle.c:17:6:TIM16_DELAY_ON	8	static
 ../MyCode/PROTECT/time_delay_cycle.c:33:6:TIM16_DELAY_OFF	8	static
-../MyCode/PROTECT/time_delay_cycle.c:43:6:TIM17_CYCLE_ON	8	static
-../MyCode/PROTECT/time_delay_cycle.c:61:6:TIM17_CYCLE_OFF	8	static
-../MyCode/PROTECT/time_delay_cycle.c:68:6:Delay_Cycle_IT_Habdle	8	static
+../MyCode/PROTECT/time_delay_cycle.c:45:6:TIM17_CYCLE_ON	8	static
+../MyCode/PROTECT/time_delay_cycle.c:63:6:TIM17_CYCLE_OFF	8	static

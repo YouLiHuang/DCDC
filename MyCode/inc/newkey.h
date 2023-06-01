@@ -21,8 +21,7 @@ extern uint8_t Shift_Not_Shift;                                             //�
 extern uint8_t ON_OFF;                                                            //定义输出关闭标志位（默认不输出,只是用来显示）
 extern uint8_t OUTPUT_NOT_OUTPUT;                                          //定义是否已经输出标志位
 extern uint8_t CV_CC_CP;                                                           //定义输出类型标志位 (默认恒压输出)
-extern uint8_t CYCLE_NOT_CYCLE;                                             //定义方波标志位（默认正常输出）
-extern uint8_t DELAY_NOT_DELAY;                                             //定义延时标志位（默认不延时）
+
 extern uint8_t LOCK_UNLOCK ;                                                    //定义锁定标志位（默认不锁定）
 extern uint8_t Recall_Save ;                                                    //定义读取保存标志位（默认为读取）
 
@@ -39,9 +38,10 @@ extern uint16_t Cycle_On_ms;                                                    
 extern uint16_t Cycle_Close_s;                                                      //定义循环关闭时间的秒
 extern uint16_t Cycle_Close_ms;                                                     //定义循环关闭时间的毫秒
 
-extern uint8_t Delay_h;                                                                  //定义延时的时
-extern uint8_t Delay_m;                                                                  //定义延时的分
-extern uint8_t Delay_s;                                                                  //定义延时的秒
+
+
+extern uint16_t Delay_s;                                                                  //定义延时的秒
+extern uint16_t Delay_ms;                                                                  //定义延时的秒
 
 extern uint8_t Set_V_Slope;//设定的电压变化率
 extern uint8_t Set_I_Slope;//设定的电流变化率

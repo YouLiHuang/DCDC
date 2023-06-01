@@ -654,12 +654,11 @@ void HAL_TIM_Encoder_MspDeInit(TIM_HandleTypeDef* tim_encoderHandle)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 
-	/*soft start*/
+/**********************************************************soft start**********************************************************/
 	if(htim==&htim1)
 	{
 		keys_EN = ENABLE;//ENABLE按键
-		Flag.Current_error=0;
-		/*补充校准程序*/
+
 		__HAL_TIM_ENABLE(&htim3);
 		__HAL_TIM_ENABLE_IT(&htim3, TIM_IT_UPDATE);
 		HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
@@ -708,7 +707,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		__HAL_TIM_DISABLE(&htim1);
 
 	}
-	/*key scan*/
+/*********************************************************key scan 1ms********************************************************/
 	if(htim==&htim7)
 	{
 		Flag.TIM7_IT=1;
@@ -716,10 +715,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		Encoder_Enter_Handle();
 
 	}
-	/*encoder*/
+/********************************************************** encoder **********************************************************/
 	if(htim==&htim3)
 	{
-
 		Flag.TIM3_IT=1;
 		static int count;
 
@@ -734,21 +732,22 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 		}
 		Flag.Encoder_BF+=count;
+
 	}
-	/*cursor flash*/
+/**********************************************************cursor flash********************************************************/
 	if(htim==&htim6)
 	{
 		Flag.TIM6_IT=1;
 	}
-	/**/
+/**********************************************************暂时没用到***********************************************************/
 	if(htim==&htim14)
 	{
 		Flag.TIM14_IT=1;
 
 	}
+/**********************************************************Delay Function*******************************************************/
 	if(htim==&htim16)
 	{
-		//tim16 delay soft start delay 5s
 
 		TIM16_DELAY_OFF();//到时间了,关闭延时功能
 
@@ -759,49 +758,53 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		else if(Cycle_Function_On_Off == Cycle_Function_Off)
 		{
 			ON_OFF =ON;
-			DAC_Cmd_send(1,4,Set_Voltage);
+			power_on();
 		}
 
-
 		__HAL_TIM_CLEAR_IT(&htim16,TIM_IT_UPDATE);
-	}
 
+	}
+/**********************************************************Cycle Function*******************************************************/
 	if(htim==&htim17)
 	{
+
 		Flag.TIM17_IT=1;
 
 		if(OUTPUT_NOT_OUTPUT == OUTPUT)
 		{
 			if(ON_OFF == ON)
 			{
-				if(Cycle_On_Time > 0)
-				{
-				  Cycle_On_Time --;
-				}
+				if(Cycle_On_Time > 0) Cycle_On_Time --;
 				else
 				{
 					Cycle_On_Time = Cycle_On_s * 1000 + Cycle_On_ms;
 					Flag.TIM17_ON_OFF=0;
 					power_off();
 				}
+
 			}
+
 			else if(ON_OFF == OFF)
 			{
-				if(Cycle_Close_Time >0)
-				{
-					Cycle_Close_Time --;
-				}
+				if(Cycle_Close_Time >0) Cycle_Close_Time --;
 				else
 				{
 					Cycle_Close_Time = (Cycle_Close_s * 1000 + Cycle_Close_ms );
 					Flag.TIM17_ON_OFF=1;
 					power_on();
 				}
+
 			}
 
 		}
+		else
+		{
+			;
+		}
 
 	}
+
+/************************************************************* End *************************************************************/
 
 }
 

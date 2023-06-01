@@ -99,6 +99,7 @@ void DAC_Cmd_send(uint8_t IDindex,uint8_t cmd,uint16_t Data_To_Send)
 {
 
 	__HAL_UART_ENABLE(&huart2);
+	memset(&Uart2_Send_buffer[0],0,9);
 	/*********************ID&Command*********************/
 	Uart2_Send_buffer[0]=IDindex;//id
 	Uart2_Send_buffer[1]=cmd;//cmd
@@ -197,10 +198,13 @@ void power_off(void)
 {
 
 	ON_OFF =OFF;
+	uint16_t temp_V=Set_Voltage;
+	uint16_t temp_I=Set_Current;
 	Set_Voltage=100;
 	Set_Current=100;
 	DAC_Cmd_send(1,6,0);
-
+	Set_Voltage=temp_V;
+	Set_Current=temp_I;
 
 }
 /**
@@ -211,9 +215,14 @@ void power_off(void)
 void Output_Zero(void)
 {
 
-	DAC_Cmd_send(1,4,100);
-	HAL_Delay(10);
-	DAC_Cmd_send(1,5,100);
+	uint16_t temp_V=Set_Voltage;
+	uint16_t temp_I=Set_Current;
+	Set_Voltage=10;
+	Set_Current=10;
+	DAC_Cmd_send(1,6,0);
+	Set_Voltage=temp_V;
+	Set_Current=temp_I;
+
 
 }
 /**

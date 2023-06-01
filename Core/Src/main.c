@@ -216,12 +216,7 @@ void My_sys_Init(void)
 	UART_Start_Receive_DMA(&huart2,Uart2_Receive_buffer,20);
 	__HAL_UART_CLEAR_IT(&huart2,UART_CLEAR_IDLEF);
 	/*Delay on soft start*/
-	DAC_Cmd_send(1,2,0x01);
-	HAL_Delay(10);
-	DAC_Cmd_send(1,4,100);
-	HAL_Delay(10);
-	DAC_Cmd_send(1,5,100);
-	HAL_Delay(10);
+	DAC_Cmd_send(1,11,0);
 	/*all device initialize�?? soft start timer on，power on*/
 	HAL_TIM_Base_Start_IT(&htim1);
 
@@ -243,6 +238,13 @@ void IT_handle(void)
 		{
 			Flag.TIM7_IT=0;
 			KEY_Handle();
+			/*sleep*/
+			if(COUNT_ESC==2)
+			{
+				COUNT_ESC=0;
+				Sleep_ON_OFF = ~Sleep_ON_OFF;
+			}
+
 		}
 		/*Cursor flash*/
 		if(Flag.TIM6_IT==1)

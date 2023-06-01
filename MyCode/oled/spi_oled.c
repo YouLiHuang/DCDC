@@ -1333,7 +1333,8 @@ void Display_Main_Interface_I_set  (void)
 	if(Keys_Encoder_Mode==Encoder_Mode)
 	{
 		Write_String_8x16AsicII(48,56,"ISET");
-		/*编码器模式下显示上一电压设定值*/
+
+		/*编码器模式下显示电压设定值*/
 		float Voltage=Set_Voltage/100.0;
 		static char String_Voltage_real[7]={'0','0','0','.','0','0'};
 		if(Voltage>=100)   		sprintf(String_Voltage_real, "%6.2f", Voltage);//将float转为string，保留一位小数
@@ -1352,6 +1353,7 @@ void Display_Main_Interface_I_set  (void)
 
 		Write_String_16x32AsicII(16, 0, String_Voltage_real);
 		Write_Single_16x32AsicII(16,24, 'V');
+
 		/*编码器模式下显示电流设定值*/
 		float Current=String_to_float(String_Current);
 		if(Current>=100)   		sprintf(String_Current, "%6.2f", Current);//将float转为string，保留一位小数
@@ -1375,6 +1377,7 @@ void Display_Main_Interface_I_set  (void)
 	else if(Keys_Encoder_Mode==Keys_Mode)
 	{
 		Write_String_8x16AsicII(48,56,"ISET");
+
 		/*按键模式下显示上一电压设定值*/
 		float Voltage=Set_Voltage/100.0;
 		static char String_Voltage_real[7]={'0','0','0','.','0','0'};
@@ -1420,8 +1423,6 @@ void Display_Main_Interface(const float Voltage,
 							const float Current,
 							const uint8_t ON_OFF,
 	                        const uint8_t CV_CC_CP,
-							const uint8_t CYCLE_NOT_CYCLE,
-							const uint8_t DELAY_NOT_DELAY,
 							const uint8_t Preset_Actual,
 							const uint8_t LOCK_UNLOCK,
 							const uint8_t Shift_NotShift)
@@ -1447,6 +1448,7 @@ void Display_Main_Interface(const float Voltage,
 
 void Display_Param_Interface(const uint16_t Set_Voltage,const uint16_t Set_Current)
 {
+
 
 	float Voltage,Current;
 	Voltage=Set_Voltage/100.0;
@@ -1858,6 +1860,7 @@ void Display_Menu_Function_Interface_Second_Menu(int y,int z)
 	{
 		case 1://system
 		{
+			/*此处补充复位对象界面*/
 			second_munu_system(z);
 			break;
 		}
@@ -2071,72 +2074,11 @@ void Display_RS232_BaudRate(int RS232_BaudRate)
   Write_String_16x32AsicII(32, 40, String_RS232_BaudRate);
 }
 
-/**
- * @brief  显示Delay的设置界面
- * @param	None
- * @retval None
- */
-void Display_Oled_Delay(void)
-{
-	String_Delay[0] = Delay_h / 10 + '0';
-	String_Delay[1] = Delay_h % 10 + '0';
-	String_Delay[2] = 'h';
-	String_Delay[3] = Delay_m / 10 + '0';
-	String_Delay[4] = Delay_m % 10 + '0';
-	String_Delay[5] = 'm';
-	String_Delay[6] = Delay_s / 10 + '0';
-	String_Delay[7] = Delay_s % 10 + '0';
-	String_Delay[8] = 's';
 
-	Write_String_16x32AsicII(0, 0, "Delay Time:");
-	Write_String_16x32AsicII(32, 14, String_Delay);  //在显示屏显示
 
-}
 
-/**
- * @brief  显示Cycle开启时间的设置界面
- * @param	None
- * @retval None
- */
-void Display_Oled_CycleOn(void)
-{
-	String_Cycle_On[0] = Cycle_On_s / 1000 + '0';
-	String_Cycle_On[1] = (Cycle_On_s / 100) % 10 + '0';
-	String_Cycle_On[2] = (Cycle_On_s / 10) % 10 + '0';
-	String_Cycle_On[3] = Cycle_On_s % 10 + '0';
-	String_Cycle_On[4] = 's';
-	String_Cycle_On[5] = Cycle_On_ms / 100 + '0';
-	String_Cycle_On[6] = (Cycle_On_ms / 10) % 10 + '0';
-	String_Cycle_On[7] = Cycle_On_ms % 10 + '0';
-	String_Cycle_On[8] = 'm';
-	String_Cycle_On[9] = 's';
 
-	Write_String_16x32AsicII(0, 0, "Open Time:");          //在OLED屏显示
-	Write_String_16x32AsicII(32, 12, String_Cycle_On);
 
-}
-
-/**
- * @brief  显示Cycle关闭时间的设置界面
- * @param	None
- * @retval None
- */
-void Display_Oled_CycleClose(void)
-{
-	String_Cycle_Close[0] = Cycle_Close_s / 1000 + '0';
-	String_Cycle_Close[1] = (Cycle_Close_s / 100) % 10 + '0';
-	String_Cycle_Close[2] = (Cycle_Close_s / 10) % 10 + '0';
-	String_Cycle_Close[3] = Cycle_Close_s % 10 + '0';
-	String_Cycle_Close[4] = 's';
-	String_Cycle_Close[5] = Cycle_Close_ms / 100 + '0';
-	String_Cycle_Close[6] = (Cycle_Close_ms / 10) % 10 + '0';
-	String_Cycle_Close[7] = Cycle_Close_ms % 10 + '0';
-	String_Cycle_Close[8] = 'm';
-	String_Cycle_Close[9] = 's';
-
-	Write_String_16x32AsicII(0, 0, "Close Time:");          //在OLED屏显示
-	Write_String_16x32AsicII(32, 12, String_Cycle_Close);
-}
 
 /**
  * @brief  显示V-Rate时间的设置界面
@@ -2269,7 +2211,11 @@ void Cursor_flash_on(void)
   */
 void Display_Interface(void)
 {
-	if(Sleep_ON_OFF!=0xff) return;
+	if(Sleep_ON_OFF!=0xff)
+	{
+		Clear_Screen();
+		return;
+	}
 	if(Last_Interface.coordinates1!=xyz.coordinates1
 	   ||Last_Interface.coordinates2!=xyz.coordinates2
 	   ||Last_Interface.coordinates3!=xyz.coordinates3)
@@ -2280,7 +2226,7 @@ void Display_Interface(void)
 	/*main interface*/
 	if((xyz.coordinates1==0) && (xyz.coordinates2==0) && (xyz.coordinates3==0))
 	{
-		Display_Main_Interface(Voltage_real,Current_real,ON_OFF,CV_CC_CP,CYCLE_NOT_CYCLE,DELAY_NOT_DELAY,Actual,LOCK_UNLOCK,Shift_Not_Shift);
+		Display_Main_Interface(Voltage_real,Current_real,ON_OFF,CV_CC_CP,Actual,LOCK_UNLOCK,Shift_Not_Shift);
 	}
 	/*first menu*/
 	if((xyz.coordinates1==1) && (xyz.coordinates3==0))
