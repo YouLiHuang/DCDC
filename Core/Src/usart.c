@@ -563,7 +563,7 @@ void USART2_IDLECallback(void)
 							index++;
 						}
 
-						if(Flag.Current_error==0)
+						if(Flag.Current_error==2)
 						{
 							Current_Actual-=Current_Error;//偏置
 						}

@@ -1845,13 +1845,14 @@ static void second_menu_Calibration(int z)
 	{
 		Cursor_flash_off();
 		Write_String_16x32AsicII(16,8,"Current_Zero");
-		if(Flag.Current_error==0)
+		if(Flag.Current_error==0)//校准完成，返回
 		{
 			AT25_Save_AD_Param();
 			Clear_Screen();
 			xyz.coordinates1=0;
 			xyz.coordinates2=0;
 			xyz.coordinates3=0;
+			Flag.Current_error=2;
 		    __HAL_UART_DISABLE_IT(&huart2,UART_IT_IDLE);    //关了空闲中断
 		    __HAL_UART_CLEAR_IDLEFLAG(&huart2);				//清除IDLE标志
 		    __HAL_UART_DISABLE_IT(&huart2,UART_IT_IDLE);	//清除IDLE标志
