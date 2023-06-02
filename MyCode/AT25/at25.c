@@ -391,13 +391,15 @@ void AT25_Save_VI_Rate(void)
  */
 void AT25_Save_AD_Param(void)
 {
-	uint16_t temp[4];
+	uint16_t temp[5];
 
 	temp[0] = ADC_Gain_V*1000000;
 	temp[1] = ADC_Gain_I*1000000;
 	/*test*/
 	temp[2] = (-1*Eror_ADC_V)*10000;
 	temp[3] = (-1*Eror_ADC_I)*10000;
+	/**/
+	temp[4]=Current_Error*100;
 
 	SPI_AT25_Write(temp, 86, sizeof(temp));
 
@@ -406,14 +408,19 @@ void AT25_Save_AD_Param(void)
 void AT25_load_AD_Param(void)
 {
 
-	uint16_t temp[4];
+	uint16_t temp[5];
 
 	SPI_AT25_Read((uint16_t*)temp, 86, sizeof(temp));
 
 	ADC_Gain_V=temp[0]/1000000.0;
-	ADC_Gain_I=temp[1]/1000000.0;
+	//ADC_Gain_I=temp[1]/1000000.0;
+	ADC_Gain_I=ADC_Gain_V;
+
 	Eror_ADC_V=-(temp[2]/10000.0);
-	Eror_ADC_I=-(temp[3]/10000.0);
+	//Eror_ADC_I=-(temp[3]/10000.0);
+	Eror_ADC_I=Eror_ADC_V;
+
+	Current_Error=temp[4]/100.0;
 }
 
 

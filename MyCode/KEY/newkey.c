@@ -924,14 +924,15 @@ void Key_I_set(void)
 	/*timer*/
 	if((xyz.coordinates1==1) && (xyz.coordinates2==4) && (xyz.coordinates3!=0) && (LOCK_UNLOCK == UNLOCK))
 	{
-		if(Cursor_Position==7)
+		if(Cursor_Position==12)
 		{
-			Cursor_Position=0;
+			Cursor_Position=5;
 			return;
 		}
-		if(Cursor_Position==3)
+		if(Cursor_Position==8)
 		{
-			Cursor_Position=4;
+			Cursor_Position=10;
+			return;
 
 		}
 
@@ -1293,23 +1294,31 @@ static void Reset_enter(void)
 {
 
 	AT25_Reset();
-
-	static uint8_t count=1;
-
-	if(count==3)
-	{
-		count=1;
-		NVIC_SystemReset();
-	}
-	else if(count==2)
-	{
-		DAC_Cmd_send(1,12,0);
-
-	}
-
 	Cursor_flash_off();
 
-	count++;
+	switch(xyz.coordinates3)
+	{
+		case 1:
+		{
+			DAC_Cmd_send(1,12,0);
+			break;
+		}
+		case 2:
+		{
+			NVIC_SystemReset();
+			break;
+		}
+		case 3:
+		{
+			DAC_Cmd_send(1,12,0);
+			HAL_Delay(10);
+			NVIC_SystemReset();
+			break;
+		}
+
+	}
+
+
 }
 
 static void Frq_enter(void)
@@ -1346,6 +1355,12 @@ void Key_Enter(void)
 		if((xyz.coordinates1==0) && (xyz.coordinates2==0) && (xyz.coordinates3==0))
 		{
 			DAC_Cmd_send(1,2,0x01);
+			HAL_Delay(10);
+		    __HAL_UART_DISABLE_IT(&huart2,UART_IT_IDLE);    //关了空闲中断
+		    __HAL_UART_CLEAR_IDLEFLAG(&huart2);				//清除IDLE标志
+		    __HAL_UART_DISABLE_IT(&huart2,UART_IT_IDLE);	//清除IDLE标志
+		    __HAL_UART_ENABLE_IT(&huart2,UART_IT_IDLE);    	//使能空闲中断
+		    UART_Start_Receive_DMA(&huart2,Uart2_Receive_buffer,9);
 		}
 		/*first menu enter second menu*/
 		if( xyz.coordinates1==1 && (xyz.coordinates3==0) )//当处于第一级菜单,按下enter进入二级菜单
@@ -1397,7 +1412,7 @@ void Key_Enter(void)
 			Load_enter();
 		}
 		/*reset enter*/
-		if((xyz.coordinates1==1) && (xyz.coordinates2==1) && (xyz.coordinates3==1))
+		if((xyz.coordinates1==1) && (xyz.coordinates2==1) && (xyz.coordinates3>=1))
 		{
 			Reset_enter();
 		}
@@ -1446,20 +1461,31 @@ void Key_Enter(void)
 			Vref[1]=String_To_Float(String_Calibration_Vlotage);
 			ADC_Gain_V=(Vref[1]-Vref[0])/(data_V[1]-data_V[0]);
 			Eror_ADC_V=Vref[0]-ADC_Gain_V*data_V[0];
+
+			/*电流校准要进行后续修改*/
+			ADC_Gain_I=ADC_Gain_V;
+			Eror_ADC_I=Eror_ADC_V;
+
 			AT25_Save_AD_Param();
 			xyz.coordinates3++;
 			Cursor_Position=9;
 			return;
 		}
 		/*I calibration*/
+
 		if( (xyz.coordinates1==1) && (xyz.coordinates2==8) && (xyz.coordinates3==3))
+		{
+			Flag.Current_error=1;
+
+		}
+		if( (xyz.coordinates1==1) && (xyz.coordinates2==8) && (xyz.coordinates3==4))
 		{
 			data_I[0]=Uart2_Receive_buffer[5]*256+Uart2_Receive_buffer[6];
 			Iref[0]=String_To_Float(String_Calibration_Current);
 			xyz.coordinates3++;
 			return;
 		}
-		if( (xyz.coordinates1==1) && (xyz.coordinates2==8) && (xyz.coordinates3==4))
+		if( (xyz.coordinates1==1) && (xyz.coordinates2==8) && (xyz.coordinates3==5))
 		{
 			data_I[1]=Uart2_Receive_buffer[5]*256+Uart2_Receive_buffer[6];
 			Iref[1]=String_To_Float(String_Calibration_Current);
@@ -1679,8 +1705,7 @@ void Key_Up(void)
 	if((xyz.coordinates1==0) && (xyz.coordinates2==0) && (xyz.coordinates3==0))
 	{
 
-		//get_voltage_current(READ_VOLTAGE);
-		DAC_Cmd_send(1,0x0a,0x00);//rise
+		;
 
 	}
 	/*first menu*/
@@ -1704,7 +1729,12 @@ void Key_Up(void)
 		if(Cursor_Position==3+9)	Cursor_Position=4+9;
 		if(Cursor_Position==6+9)	Cursor_Position=0+9;
 	}
-
+	/*reset*/
+	if((xyz.coordinates1==1) && (xyz.coordinates2==1) && (xyz.coordinates3!=0))
+	{
+		if(xyz.coordinates3==3)	xyz.coordinates3=1;
+		else 					xyz.coordinates3++;
+	}
 	/*AD set*/
 	if((xyz.coordinates1==1) && (xyz.coordinates2==5) && (xyz.coordinates3>1))
 	{
@@ -1763,7 +1793,7 @@ void Key_Up(void)
 	if((xyz.coordinates1==1) && (xyz.coordinates2==8) && (xyz.coordinates3!=0))//cycle third menu enter
 	{
 		Cursor_Position=9;
-		if(xyz.coordinates3==4) xyz.coordinates3=1;
+		if(xyz.coordinates3==5) xyz.coordinates3=1;
 		else                    xyz.coordinates3++;
 
 	}
@@ -1882,7 +1912,7 @@ void Key_Down(void)
 	if((xyz.coordinates1==1) && (xyz.coordinates2==8) && (xyz.coordinates3!=0))//cycle third menu enter
 	{
 		Cursor_Position=9;
-		if(xyz.coordinates3==1) xyz.coordinates3=4;
+		if(xyz.coordinates3==1) xyz.coordinates3=5;
 		else                    xyz.coordinates3--;
 
 	}

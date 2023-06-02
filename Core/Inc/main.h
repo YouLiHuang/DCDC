@@ -49,8 +49,8 @@ typedef struct
 			int TIM14_IT;
 			int ERROR_Flag;
 			int SLEEP_ON_OFF;
+			int Current_error;
 			float FAN_LEVEL;
-			float Current_error;
 
 		}IT_Flag;
 extern IT_Flag Flag;

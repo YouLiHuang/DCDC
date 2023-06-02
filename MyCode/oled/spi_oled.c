@@ -1666,13 +1666,25 @@ void Display_Menu_Function_Interface_First_Menu(int Selection)
 
 static void second_munu_system(int z)
 {
-	Write_String_16x32AsicII(16,24,"RESET");
+
 	if(z==1)
 	{
+		Write_String_16x32AsicII(16,16,"MINI_RESET");
 		Cursor_flash_off();
 		return;
 	}
-	else if(z==2);
+	else if(z==2)
+	{
+		Write_String_16x32AsicII(16,16,"MCU_RESET ");
+		Cursor_flash_off();
+		return;
+	}
+	else if(z==3)
+	{
+		Write_String_16x32AsicII(16,16,"ALL_RESET ");
+		Cursor_flash_off();
+		return;
+	}
 
 }
 
@@ -1768,7 +1780,11 @@ static void second_menu_AD(int z)
 	}
 	else if(z==3)
 	{
-		;
+		char String[9]={'0','0','.','0','0','0','0','0'};
+		Write_String_8x16AsicII(0,0,"ERROR_I:");
+		sprintf(String, "%6.5f", Current_Error);//将float转为string，数据长度为6，保留两位小数
+		Write_String_8x16AsicII(0,26, String);
+
 	}
 }
 
@@ -1825,8 +1841,26 @@ static void second_menu_Calibration(int z)
 		Write_Single_8x16AsicII(48,44, 'V');
 
 	}
-
 	if(z==3)
+	{
+		Cursor_flash_off();
+		Write_String_16x32AsicII(16,8,"Current_Zero");
+		if(Flag.Current_error==0)
+		{
+			AT25_Save_AD_Param();
+			Clear_Screen();
+			xyz.coordinates1=0;
+			xyz.coordinates2=0;
+			xyz.coordinates3=0;
+		    __HAL_UART_DISABLE_IT(&huart2,UART_IT_IDLE);    //关了空闲中断
+		    __HAL_UART_CLEAR_IDLEFLAG(&huart2);				//清除IDLE标志
+		    __HAL_UART_DISABLE_IT(&huart2,UART_IT_IDLE);	//清除IDLE标志
+		    __HAL_UART_ENABLE_IT(&huart2,UART_IT_IDLE);    	//使能空闲中断
+		    UART_Start_Receive_DMA(&huart2,Uart2_Receive_buffer,9);
+		}
+
+	}
+	if(z==4)
 	{
 		Cursor_flash_on();
 		Write_String_16x32AsicII(16,0,"POINT1");
@@ -1835,7 +1869,7 @@ static void second_menu_Calibration(int z)
 		Write_Single_8x16AsicII(48,44, 'A');
 
 	}
-	if(z==4)
+	if(z==5)
 	{
 		Cursor_flash_on();
 		Write_String_16x32AsicII(16,0,"POINT2");
@@ -1843,6 +1877,8 @@ static void second_menu_Calibration(int z)
 		Write_String_16x32AsicII(16,36,String_Calibration_Current);
 		Write_Single_8x16AsicII(48,44, 'A');
 	}
+
+
 }
 
 /**

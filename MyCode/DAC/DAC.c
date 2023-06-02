@@ -118,7 +118,12 @@ void DAC_Cmd_send(uint8_t IDindex,uint8_t cmd,uint16_t Data_To_Send)
 	  Uart2_Send_buffer[4]=0x00;//data L
 	  switch(cmd)
 	  {
-		  case 0://pwm EN
+	  	  case 0xff:
+	  	  {
+			  Uart2_Send_buffer[4]|=(Data_To_Send&0x00ff);//low max_voltage
+			  Uart2_Send_buffer[3]|=(Data_To_Send>>8);//Hight max_voltage
+			  break;
+	  	  }
 		  case 1:break;//read voltage
 		  case 2:break;//loop read
 		  case 3:break;//read current
@@ -183,10 +188,12 @@ void DAC_Cmd_send(uint8_t IDindex,uint8_t cmd,uint16_t Data_To_Send)
   */
 void power_on(void)
 {
-
-
 	ON_OFF =ON;
+	DAC_Cmd_send(1,0xff,0);
+	HAL_Delay(10);
+
 	DAC_Cmd_send(1,6,0);
+
 
 }
 /**
@@ -205,6 +212,8 @@ void power_off(void)
 	DAC_Cmd_send(1,6,0);
 	Set_Voltage=temp_V;
 	Set_Current=temp_I;
+	HAL_Delay(150);//等待缓降完成
+	DAC_Cmd_send(1,0xff,1);
 
 }
 /**
@@ -217,9 +226,9 @@ void Output_Zero(void)
 
 	uint16_t temp_V=Set_Voltage;
 	uint16_t temp_I=Set_Current;
-	Set_Voltage=10;
-	Set_Current=10;
-	DAC_Cmd_send(1,6,0);
+	Set_Voltage=1;
+	Set_Current=1;
+	DAC_Cmd_send(1,0xff,1);
 	Set_Voltage=temp_V;
 	Set_Current=temp_I;
 

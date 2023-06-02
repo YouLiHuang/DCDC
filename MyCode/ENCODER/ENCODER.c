@@ -703,6 +703,7 @@ static void enter_action(void)
 	if((xyz.coordinates1==1) && (xyz.coordinates2!=0) && (xyz.coordinates3==0))
 	{
 		xyz.coordinates3=1;//enter second menu
+		Cursor_Position=6;
 	}
 	/*second menu*/
 	if((xyz.coordinates1==1) && (xyz.coordinates2!=0) && (xyz.coordinates3!=0) )

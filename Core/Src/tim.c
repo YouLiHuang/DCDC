@@ -768,7 +768,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if(htim==&htim17)
 	{
 
-		Flag.TIM17_IT=1;
 
 		if(OUTPUT_NOT_OUTPUT == OUTPUT)
 		{

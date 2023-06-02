@@ -188,6 +188,7 @@ void My_sys_Init(void)
 	Flag.TIM17_IT=0;
 	Flag.ERROR_Flag=0;
 	Flag.Encoder_BF=0;
+	Flag.Current_error=3;
 	/*main interface*/
 	xyz.coordinates1=0;
 	xyz.coordinates2=0;
@@ -213,12 +214,14 @@ void My_sys_Init(void)
 	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)ADC_temp_buffer,2);
 	/*start to communicate with mini board*/
 	__HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);
-	UART_Start_Receive_DMA(&huart2,Uart2_Receive_buffer,20);
+	UART_Start_Receive_DMA(&huart2,Uart2_Receive_buffer,9);
 	__HAL_UART_CLEAR_IT(&huart2,UART_CLEAR_IDLEF);
 	/*Delay on soft start*/
 	DAC_Cmd_send(1,11,0);
-	/*all device initialize�?? soft start timer on，power on*/
+	/*all device initialize soft start timer on，power on*/
 	HAL_TIM_Base_Start_IT(&htim1);
+	/*loop mode*/
+	DAC_Cmd_send(1,2,0);
 
 }
 /**
@@ -290,11 +293,7 @@ void IT_handle(void)
 			Flag.TIM14_IT=0;
 
 		}
-		if(Flag.TIM17_IT==1)
-		{
-			Flag.TIM17_IT=0;
 
-		}
 
 
 }

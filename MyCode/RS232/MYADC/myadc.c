@@ -5,6 +5,9 @@ float ADC_Gain_V=0.00253;
 float ADC_Gain_I=0.00253;
 float Eror_ADC_V=-0.2185;
 float Eror_ADC_I=-0.2185;
+
+float Current_Error=0.0;
+
 /*改进版本*/
 float Voltage_real=0.0;      //实际电压值，用于显示
 float Current_real=0.0;      //实际电流值，用于显示

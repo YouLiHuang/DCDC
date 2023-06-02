@@ -11,5 +11,5 @@
 ../MyCode/ENCODER/ENCODER.c:676:13:Light_data_Refresh	8	static
 ../MyCode/ENCODER/ENCODER.c:684:13:FAN_data_Refresh	16	static
 ../MyCode/ENCODER/ENCODER.c:700:13:enter_action	8	static
-../MyCode/ENCODER/ENCODER.c:841:6:Encoder_Data_refresh	8	static
-../MyCode/ENCODER/ENCODER.c:970:6:Encoder_Enter_Handle	8	static
+../MyCode/ENCODER/ENCODER.c:842:6:Encoder_Data_refresh	8	static
+../MyCode/ENCODER/ENCODER.c:971:6:Encoder_Enter_Handle	8	static

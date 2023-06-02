@@ -443,7 +443,58 @@ void My_Usart3_Config(uint32_t RS232_BaudRate)
 
 }
 
+static void bubble_sort(float arr[], uint8_t len) {
+    int i, j;
+    for (i = 0; i < len - 1; i++) {
+        for (j = 0; j < len - 1 - i; j++) {
+            if (arr[j] > arr[j+1]) {
+                int temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+        }
+    }
+}
+
+static void Swap(float * a,float * b)
+{
+	float  temp=*a;
+	*a=*b;
+	*b=temp;
+}
+
+// 冒泡排序
+void BubbleSort(float* a, int n)
+{
+
+	int i = 0;
+	int flag = 0;
+
+    //n-1趟排序
+	for (i = 0; i < n-1; i++)
+	{
+		int j = 0;
+
+        //一趟冒泡排序
+		for (j = 0; j < n - i - 1; j++)
+		{
+			if (a[j] > a[j+1])
+			{
+				Swap(&a[j], &a[j+1]);
+				flag = 1;
+			}
+		}
+
+        //若某一趟排序中没有元素交换则说明所有元素已经有序，不需要再排序
+		if (flag == 0)
+		{
+			break;
+		}
+	}
+}
+
 static float Current_error[100]={0x00};
+
 
 /**
   * @brief  串口2的接收空闲回调，用于和控制板通信
@@ -495,14 +546,27 @@ void USART2_IDLECallback(void)
 						Current_Actual=ADC_Gain_I*(Uart2_Receive_buffer[5]*256+Uart2_Receive_buffer[6])+Eror_ADC_I;
 						Current_Actual*=1000;//61mv/A
 						Current_Actual/=61;
-						//Current_Actual-=Current_Error;//偏置
-						/*
+
 						if(Flag.Current_error==1)
 						{
-							Current_error[index++]=Current_Actual;
-							if(index==100)	index=0;
+							static uint8_t index=0;
+							if(index==100)
+							{
+								BubbleSort(&Current_error[0],index);
+								Current_Error=Current_error[50];
+								index=0;
+								Flag.Current_error=0;
+
+								return;
+							}
+							Current_error[index]=Current_Actual;
+							index++;
 						}
-						*/
+
+						if(Flag.Current_error==0)
+						{
+							Current_Actual-=Current_Error;//偏置
+						}
 
 						break;
 					}
